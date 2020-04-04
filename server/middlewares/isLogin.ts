@@ -12,6 +12,8 @@ export default function isLogin() {
         'getDefaultGroupHistoryMessages',
         'getDefaultGroupOnlineMembers',
         'getBaiduToken',
+        'queryGroup',
+        'queryUser',
     ]);
     return async (ctx: KoaContext, next: Function) => {
         if (!noRequireLoginEvent.has(ctx.event) && !ctx.socket.user) {

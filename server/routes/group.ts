@@ -299,7 +299,7 @@ export async function queryGroup(ctx: KoaContext<QueryGroup>) {
     }
 
     const messages = await Message.find(
-        { toGroup: groupId },
+        { to: groupId },
         {
             type: 1,
             content: 1,
@@ -307,7 +307,7 @@ export async function queryGroup(ctx: KoaContext<QueryGroup>) {
             createTime: 1,
         },
         { sort: { createTime: -1 }, limit: 3 },
-    ).populate('from', { username: 1, avatar: 1 });
+    );
     messages.reverse();
 
     return {
@@ -316,6 +316,7 @@ export async function queryGroup(ctx: KoaContext<QueryGroup>) {
         avatar: group.avatar,
         createTime: group.createTime,
         creator: group.creator,
+        members: group.members,
         messages,
     };
 }
