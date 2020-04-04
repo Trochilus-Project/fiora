@@ -565,3 +565,29 @@ export async function getUserIps(ctx: KoaContext<{ userId: string }>): Promise<s
     const sockets = await Socket.find({ user: userId });
     return sockets.map((socket) => socket.ip) || [];
 }
+
+interface QueryUser {
+    userId: string;
+}
+
+/**
+ * 获取指定用户的信息, 由 Trochilus Project 扩展
+ * @param ctx Context
+ */
+export async function queryUser(ctx: KoaContext<QueryUser>) {
+    const { userId } = ctx.data;
+    assert(userId, 'userId不能为空');
+    assert(isValid(userId), '不合法的userId');
+
+    const user = await User.findOne({ user: userId });
+    if (!user) {
+        throw new AssertionError({ message: '该用户不存在' });
+    }
+
+    return {
+        _id: user._id,
+        username: user.username,
+        avatar: user.avatar,
+        createTime: user.createTime,
+    };
+}

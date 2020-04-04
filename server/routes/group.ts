@@ -279,3 +279,43 @@ export async function deleteGroup(ctx: KoaContext<DeleteGroupData>) {
 
     return {};
 }
+
+interface QueryGroup {
+    /** 目标群组 id */
+    groupId: string;
+}
+
+/**
+ * 获取目标群的信息, 由 Trochilus Project 扩展
+ * @param ctx Context
+ */
+export async function queryGroup(ctx: KoaContext<QueryGroup>) {
+    const { groupId } = ctx.data;
+    assert(isValid(groupId), '无效的群组ID');
+
+    const group = await Group.findOne({ _id: groupId });
+    if (!group) {
+        throw new AssertionError({ message: '群组不存在' });
+    }
+
+    const messages = await Message.find(
+        { toGroup: groupId },
+        {
+            type: 1,
+            content: 1,
+            from: 1,
+            createTime: 1,
+        },
+        { sort: { createTime: -1 }, limit: 3 },
+    ).populate('from', { username: 1, avatar: 1 });
+    messages.reverse();
+
+    return {
+        _id: group._id,
+        name: group.name,
+        avatar: group.avatar,
+        createTime: group.createTime,
+        creator: group.creator,
+        messages,
+    };
+}
